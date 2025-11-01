@@ -1,98 +1,140 @@
 import { useState } from "react";
-import { ArrowLeft, Search, Mic, MapPin, Home, Map, Heart, User } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import MenuDown from "../components/MenuDown";
 import SearchBar from "../components/SearchBar";
+import { Link } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 export default function Busca() {
-
+  const [tipoBusca, setTipoBusca] = useState("medicamentos");
   const [query, setQuery] = useState("");
-  const results = [
-    {
-      id: 1,
-      nome: "Insulina Regular",
-      unidade: "UBS Centro",
-      endereco: "Rua das Flores, 123",
-      distancia: "2km",
-      qtd: "101 unid.",
-      status: "disponível",
-      atualizado: "há 1h",
-    },
-    {
-      id: 2,
-      nome: "Insulina Regular",
-      unidade: "UBS Paulista",
-      endereco: "Rua do Jardim, 234",
-      distancia: "4km",
-      qtd: "20 unid.",
-      status: "baixo",
-      atualizado: "há 10h",
-    },
-    {
-      id: 3,
-      nome: "Insulina NPH",
-      unidade: "UBS Recife",
-      endereco: "Rua Mirabela, 180",
-      distancia: "2km",
-      qtd: "Indisponível",
-      status: "indisponível",
-      atualizado: "há 1h",
-    },
+  const navigate = useNavigate();
+
+  const medicamentos = [
+    { id: 1, nome: "Insulina Regular", unidade: "UBS Centro", endereco: "Rua das Flores, 123", distancia: "2km", qtd: "101 unid." },
+    { id: 2, nome: "Paracetamol", unidade: "UBS Boa Vista", endereco: "Av. Paulista, 210", distancia: "3km", qtd: "89 unid." },
+    { id: 3, nome: "Dipirona Sódica", unidade: "UBS Recife", endereco: "Rua Mirabela, 180", distancia: "2.5km", qtd: "55 unid." },
+    { id: 4, nome: "Amoxicilina", unidade: "UBS Norte", endereco: "Av. Brasil, 520", distancia: "4km", qtd: "120 unid." },
+    { id: 5, nome: "Ibuprofeno", unidade: "UBS Jardim", endereco: "Rua Esperança, 45", distancia: "3.2km", qtd: "76 unid." },
+    { id: 6, nome: "Omeprazol", unidade: "UBS Santo Antônio", endereco: "Av. Bela Vista, 890", distancia: "2.8km", qtd: "95 unid." },
+    { id: 7, nome: "Metformina", unidade: "UBS Santa Luzia", endereco: "Rua das Oliveiras, 34", distancia: "3km", qtd: "64 unid." },
+    { id: 8, nome: "Loratadina", unidade: "UBS Boa Vista", endereco: "Av. Paulista, 210", distancia: "3km", qtd: "41 unid." },
+    { id: 9, nome: "Ácido Fólico", unidade: "UBS Centro", endereco: "Rua das Flores, 123", distancia: "2km", qtd: "50 unid." },
+    { id: 10, nome: "Vitamina D", unidade: "UBS Recife", endereco: "Rua Mirabela, 180", distancia: "2km", qtd: "30 unid." },
   ];
 
-  return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-        <SearchBar
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder="Busque na sua localidade"
-      />
-      
-      <div className="p-4 flex-1">
-        {results.map((item) => (
-          <div
-            key={item.id}
-            className={`bg-white rounded-2xl p-4 mb-3 shadow border ${
-              item.status === "disponível"
-                ? "border-blue-400"
-                : item.status === "baixo"
-                ? "border-yellow-400"
-                : "border-gray-300"
-            }`}
-          >
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="font-semibold text-gray-900">{item.nome}</p>
-                <p className="text-gray-600 text-sm">{item.unidade}</p>
-                <p className="text-gray-500 text-sm">{item.endereco}</p>
-              </div>
-              <div className="text-right">
-                {item.status === "disponível" && (
-                  <p className="text-green-600 text-sm font-medium">● {item.qtd}</p>
-                )}
-                {item.status === "baixo" && (
-                  <p className="text-yellow-600 text-sm font-medium">● {item.qtd}</p>
-                )}
-                {item.status === "indisponível" && (
-                  <p className="text-red-600 text-sm font-medium">● {item.qtd}</p>
-                )}
-                <p className="text-gray-400 text-xs">Atualizado {item.atualizado}</p>
-              </div>
-            </div>
+  const unidades = [
+    { id: 1, nome: "UBS Centro", endereco: "Rua das Flores, 123 - Centro", distancia: "2km", horario: "Aberto até 17h" },
+    { id: 2, nome: "UBS Boa Vista", endereco: "Av. Paulista, 210", distancia: "3km", horario: "Aberto até 16h" },
+    { id: 3, nome: "UBS Recife", endereco: "Rua Mirabela, 180", distancia: "2.5km", horario: "Aberto até 18h" },
+    { id: 4, nome: "UBS Santo Antônio", endereco: "Av. Bela Vista, 890", distancia: "2.8km", horario: "Aberto até 17h" },
+    { id: 5, nome: "UBS Jardim", endereco: "Rua Esperança, 45", distancia: "3.2km", horario: "Aberto até 15h" },
+    { id: 6, nome: "UBS Santa Luzia", endereco: "Rua das Oliveiras, 34", distancia: "3km", horario: "Aberto até 17h" },
+  ];
 
-            <div className="flex justify-between items-center mt-3">
-              <div className="flex items-center text-gray-600 text-sm">
-                <MapPin className="w-4 h-4 mr-1 text-gray-500" />
-                {item.distancia}
-              </div>
-              <button className="bg-teal-600 text-white px-4 py-1 rounded-full text-sm font-medium hover:bg-teal-700">
-                Ver detalhes
-              </button>
-            </div>
-          </div>
-        ))}
+  const lista =
+    tipoBusca === "medicamentos"
+      ? medicamentos.filter((item) =>
+          item.nome.toLowerCase().includes(query.toLowerCase())
+        )
+      : unidades.filter((item) =>
+          item.nome.toLowerCase().includes(query.toLowerCase())
+        );
+
+  return (
+    <div className="min-h-screen bg-gray-50 pb-24">
+      {/* Header */}
+      <div className="p-4 bg-white flex items-center gap-3 shadow-sm">
+        <ArrowLeft className="text-gray-700" onClick={() => navigate(-1)}/>
+        <h1 className="font-semibold text-lg">Buscar</h1>
       </div>
 
-      <MenuDown/>
+      {/* Filtros */}
+      <div className="flex justify-around bg-white shadow-sm">
+        <button
+          onClick={() => {
+            setTipoBusca("medicamentos");
+            setQuery("");
+          }}
+          className={`flex-1 py-3 ${
+            tipoBusca === "medicamentos"
+              ? "text-green-600 border-b-2 border-green-600"
+              : "text-gray-500"
+          }`}
+        >
+          Medicamentos
+        </button>
+        <button
+          onClick={() => {
+            setTipoBusca("unidades");
+            setQuery("");
+          }}
+          className={`flex-1 py-3 ${
+            tipoBusca === "unidades"
+              ? "text-green-600 border-b-2 border-green-600"
+              : "text-gray-500"
+          }`}
+        >
+          Unidades
+        </button>
+      </div>
+
+      {/* Barra de busca */}
+      <div className="px-4">
+        <SearchBar value={query} onChange={(e) => setQuery(e.target.value)} />
+      </div>
+
+      {/* Resultados */}
+      <div className="p-4 space-y-3">
+        {query.length > 0 ? (
+          lista.length > 0 ? (
+            lista.map((item) =>
+              tipoBusca === "medicamentos" ? (
+                <Link
+                  key={item.id}
+                  to={`/medicamento/${item.id}`}
+                  className="bg-white rounded-2xl p-4 shadow flex justify-between items-center"
+                >
+                  <div>
+                    <p className="font-semibold">{item.nome}</p>
+                    <p className="text-sm text-gray-500">{item.unidade}</p>
+                    <p className="text-xs text-gray-400">{item.endereco}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-green-600 font-semibold">{item.qtd}</p>
+                    <p className="text-xs text-gray-500">{item.distancia}</p>
+                  </div>
+                </Link>
+              ) : (
+                <Link
+                  key={item.id}
+                  to={`/unidade/${item.id}`}
+                  className="bg-white rounded-2xl p-4 shadow flex justify-between items-center"
+                >
+                  <div>
+                    <p className="font-semibold">{item.nome}</p>
+                    <p className="text-sm text-gray-500">{item.endereco}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-green-600 text-sm">{item.distancia}</p>
+                    <p className="text-xs text-gray-500">{item.horario}</p>
+                  </div>
+                </Link>
+              )
+            )
+          ) : (
+            <p className="text-center text-gray-400 mt-10">
+              Nenhum resultado encontrado.
+            </p>
+          )
+        ) : (
+          <p className="text-center text-gray-400 mt-10">
+            Digite para buscar {tipoBusca === "medicamentos" ? "um medicamento" : "uma unidade"}...
+          </p>
+        )}
+      </div>
+
+      <MenuDown />
     </div>
   );
 }

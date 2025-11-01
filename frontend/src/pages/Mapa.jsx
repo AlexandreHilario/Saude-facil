@@ -11,7 +11,7 @@ export default function Mapa() {
     "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3957.192216631509!2d-34.92565918457137!3d-8.053893490455834!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x7ab1e6f4f3b6d2b%3A0x0!2z0JHQvtC70LDRgNCw0YXRg9C90L3QuNGP!5e0!3m2!1spt-BR!2sbr!4v1698730000000!5m2!1spt-BR!2sbr";
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-gray-50 flex flex-col pb-24">
       <SearchBar
         value={query}
         onChange={(e) => setQuery(e.target.value)}

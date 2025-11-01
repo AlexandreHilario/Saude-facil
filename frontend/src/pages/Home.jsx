@@ -1,43 +1,81 @@
-import { Search, Bell, Menu, Home, Map, Heart, User, Package, Syringe, Baby } from "lucide-react";
+import { useState } from "react";
+import {
+  Home,
+  Map,
+  Heart,
+  User,
+  Package,
+  Syringe,
+  Baby,
+} from "lucide-react";
 import MenuDown from "../components/MenuDown";
-import SearchBar from "../components/SearchBar";
 
 export default function HomePage() {
+  const [showMedicamentos, setShowMedicamentos] = useState(false);
+  const [showUnidades, setShowUnidades] = useState(false);
+
+  const medicamentos = [
+    { nome: "Dipirona Sódica", qtd: "12 caixas", unidade: "UBS Centro" },
+    { nome: "Amoxicilina", qtd: "8 caixas", unidade: "UBS Boa Vista" },
+    { nome: "Paracetamol", qtd: "15 caixas", unidade: "UBS Recife" },
+    { nome: "Insulina NPH", qtd: "Indisponível", unidade: "UBS Norte" },
+    { nome: "Omeprazol", qtd: "20 caixas", unidade: "UBS Jardim" },
+    { nome: "Metformina", qtd: "10 caixas", unidade: "UBS Santo Antônio" },
+  ];
+
+  const unidades = [
+    { nome: "UBS Centro", endereco: "Rua das Flores, 123", distancia: "2km" },
+    { nome: "UBS Boa Vista", endereco: "Av. Paulista, 210", distancia: "3km" },
+    { nome: "UBS Recife", endereco: "Rua Mirabela, 180", distancia: "4km" },
+    { nome: "UBS Jardim", endereco: "Rua Esperança, 45", distancia: "3.2km" },
+    { nome: "UBS Santo Antônio", endereco: "Av. Bela Vista, 890", distancia: "2.8km" },
+  ];
+
+  // 🔢 Contadores automáticos baseados nos dados mocados
+  const totalMedicamentos = medicamentos.length;
+  const totalUnidades = unidades.length;
+
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-gray-50 flex flex-col pb-24">
+      {/* Header */}
       <div className="p-4 bg-white shadow-sm flex items-center justify-between">
         <div className="flex items-center gap-3">
           <img
-            src="https://via.placeholder.com/40"
+            src="../../assets/avatar.png"
             alt="Avatar"
             className="w-10 h-10 rounded-full"
           />
           <div>
             <p className="text-gray-600 text-sm">Olá,</p>
-            <p className="font-semibold text-gray-900">Maria Silva</p>
+            <p className="font-semibold text-gray-900">Alexandre Vitor</p>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <Bell className="text-gray-700" />
-          <Menu className="text-gray-700" />
-        </div>
       </div>
 
-      <SearchBar/>
-
-      <div className="px-4 grid grid-cols-2 gap-3">
-        <div className="bg-white rounded-2xl p-4 shadow">
+      {/* Cards de Resumo */}
+      <div className="px-4 grid grid-cols-2 gap-3 mt-4">
+        {/* Card Medicamentos */}
+        <div
+          className="bg-white rounded-2xl p-4 shadow cursor-pointer hover:bg-gray-50 transition"
+          onClick={() => setShowMedicamentos(true)}
+        >
           <p className="text-gray-500 text-sm">Medicamentos Disponíveis</p>
-          <p className="text-2xl font-bold text-green-700">108</p>
-          <span className="text-green-500 text-xs">+12</span>
+          <p className="text-2xl font-bold text-green-700">
+            {totalMedicamentos}
+          </p>
         </div>
-        <div className="bg-white rounded-2xl p-4 shadow">
+
+        {/* Card Unidades */}
+        <div
+          className="bg-white rounded-2xl p-4 shadow cursor-pointer hover:bg-gray-50 transition"
+          onClick={() => setShowUnidades(true)}
+        >
           <p className="text-gray-500 text-sm">Unidades Próximas</p>
-          <p className="text-2xl font-bold text-green-700">6</p>
-          <span className="text-green-500 text-xs">+3</span>
+          <p className="text-2xl font-bold text-green-700">{totalUnidades}</p>
         </div>
       </div>
 
+      {/* Categorias */}
       <div className="px-4 mt-6">
         <p className="font-semibold text-gray-800 mb-3">Categorias</p>
         <div className="grid grid-cols-3 gap-3">
@@ -56,7 +94,67 @@ export default function HomePage() {
         </div>
       </div>
 
-      <MenuDown/>
+      <MenuDown />
+
+      {/* MODAL - Medicamentos */}
+      {showMedicamentos && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+          <div className="bg-white rounded-2xl shadow-lg p-5 w-11/12 max-w-md">
+            <h2 className="text-lg font-semibold mb-3 text-gray-800">
+              Medicamentos Disponíveis
+            </h2>
+            <ul className="space-y-3 max-h-60 overflow-y-auto">
+              {medicamentos.map((m, index) => (
+                <li
+                  key={index}
+                  className="border-b border-gray-100 pb-2 text-sm text-gray-700"
+                >
+                  <p className="font-medium">{m.nome}</p>
+                  <p className="text-xs text-gray-500">
+                    {m.qtd} — {m.unidade}
+                  </p>
+                </li>
+              ))}
+            </ul>
+            <button
+              className="mt-4 bg-green-600 text-white px-4 py-2 rounded-lg w-full"
+              onClick={() => setShowMedicamentos(false)}
+            >
+              Fechar
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL - Unidades */}
+      {showUnidades && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+          <div className="bg-white rounded-2xl shadow-lg p-5 w-11/12 max-w-md">
+            <h2 className="text-lg font-semibold mb-3 text-gray-800">
+              Unidades Próximas
+            </h2>
+            <ul className="space-y-3 max-h-60 overflow-y-auto">
+              {unidades.map((u, index) => (
+                <li
+                  key={index}
+                  className="border-b border-gray-100 pb-2 text-sm text-gray-700"
+                >
+                  <p className="font-medium">{u.nome}</p>
+                  <p className="text-xs text-gray-500">
+                    {u.endereco} — {u.distancia}
+                  </p>
+                </li>
+              ))}
+            </ul>
+            <button
+              className="mt-4 bg-green-600 text-white px-4 py-2 rounded-lg w-full"
+              onClick={() => setShowUnidades(false)}
+            >
+              Fechar
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
