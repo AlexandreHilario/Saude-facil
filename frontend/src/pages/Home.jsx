@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Home,
   Map,
@@ -11,8 +11,14 @@ import {
 import MenuDown from "../components/MenuDown";
 
 export default function HomePage() {
+  const [username, setUsername] = useState("Usuário");
   const [showMedicamentos, setShowMedicamentos] = useState(false);
   const [showUnidades, setShowUnidades] = useState(false);
+
+  useEffect(() => {
+    const nomeSalvo = localStorage.getItem("loggedUser");
+    if (nomeSalvo) setUsername(nomeSalvo);
+  }, []);
 
   const medicamentos = [
     { nome: "Dipirona Sódica", qtd: "12 caixas", unidade: "UBS Centro" },
@@ -47,7 +53,7 @@ export default function HomePage() {
           />
           <div>
             <p className="text-gray-600 text-sm">Olá,</p>
-            <p className="font-semibold text-gray-900">Alexandre Vitor</p>
+            <p className="font-semibold text-gray-900">{username}</p>
           </div>
         </div>
       </div>
