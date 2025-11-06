@@ -7,6 +7,9 @@ import MedicamentoDetalhe from "./pages/MedicamentoDetalhe";
 import Login from "./pages/Login";
 import Cadastro from "./pages/Cadastro";
 import ProtectedRoute from "./components/ProtectRoute";
+import Favoritos from "./pages/Favoritos";
+import Servicos from "./pages/Serviços";
+import ProfilePage from "./pages/ProfileUser";
 
 export default function App() {
   return (
@@ -54,6 +57,30 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Mapa />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/favoritos"
+          element={
+            <ProtectedRoute>
+              <Favoritos />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/servicos"
+          element={
+            <ProtectedRoute>
+              <Servicos />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/perfil"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
             </ProtectedRoute>
           }
         />

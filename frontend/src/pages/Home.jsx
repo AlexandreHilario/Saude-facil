@@ -9,6 +9,7 @@ import {
   Baby,
 } from "lucide-react";
 import MenuDown from "../components/MenuDown";
+import Header from "../components/Header";
 
 export default function HomePage() {
   const [username, setUsername] = useState("Usuário");
@@ -19,6 +20,11 @@ export default function HomePage() {
     const nomeSalvo = localStorage.getItem("loggedUser");
     if (nomeSalvo) setUsername(nomeSalvo);
   }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("loggedUser");
+    window.location.href = "/login"; // redireciona pra tela de login
+  };
 
   const medicamentos = [
     { nome: "Dipirona Sódica", qtd: "12 caixas", unidade: "UBS Centro" },
@@ -44,19 +50,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col pb-24">
       {/* Header */}
-      <div className="p-4 bg-white shadow-sm flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <img
-            src="../../assets/avatar.png"
-            alt="Avatar"
-            className="w-10 h-10 rounded-full"
-          />
-          <div>
-            <p className="text-gray-600 text-sm">Olá,</p>
-            <p className="font-semibold text-gray-900">{username}</p>
-          </div>
-        </div>
-      </div>
+      <Header username={username} onLogout={handleLogout} />
 
       {/* Cards de Resumo */}
       <div className="px-4 grid grid-cols-2 gap-3 mt-4">
@@ -96,6 +90,11 @@ export default function HomePage() {
           <div className="bg-white rounded-2xl p-4 flex flex-col items-center shadow">
             <Baby className="text-green-600" />
             <p className="text-sm mt-1">Fraldas</p>
+          </div>
+          <div className="bg-white rounded-2xl p-4 flex flex-col items-center shadow cursor-pointer hover:bg-gray-50 transition"
+              onClick={() => window.location.href = "/servicos"}>
+            <Map className="text-green-600" />
+            <p className="text-sm mt-1">Serviços</p>
           </div>
         </div>
       </div>

@@ -8,6 +8,8 @@ export default function MenuDown() {
     { name: "Início", icon: Home, path: "/" },
     { name: "Buscar", icon: Search, path: "/buscar" },
     { name: "Mapa", icon: Map, path: "/mapa" },
+    { name: "Favoritos", icon: Heart, path: "/favoritos" },
+    { name: "Perfil", icon: User, path: "/perfil" },
   ];
 
   return (

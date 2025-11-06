@@ -4,8 +4,10 @@ import MenuDown from "../components/MenuDown";
 import SearchBar from "../components/SearchBar";
 import { Link } from "react-router-dom";
 import { useParams, useNavigate } from "react-router-dom";
+import Header from "../components/Header";
 
 export default function Busca() {
+  const [username, setUsername] = useState("Usuário");
   const [tipoBusca, setTipoBusca] = useState("medicamentos");
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
@@ -41,9 +43,15 @@ export default function Busca() {
           item.nome.toLowerCase().includes(query.toLowerCase())
         );
 
+  const handleLogout = () => {
+    localStorage.removeItem("loggedUser");
+    window.location.href = "/login"; // redireciona pra tela de login
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       {/* Header */}
+      <Header username={username} onLogout={handleLogout} />
       <div className="p-4 bg-white flex items-center gap-3 shadow-sm">
         <ArrowLeft className="text-gray-700" onClick={() => navigate(-1)}/>
         <h1 className="font-semibold text-lg">Buscar</h1>
