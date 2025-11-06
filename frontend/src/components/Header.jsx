@@ -1,6 +1,12 @@
+import { useState } from "react";
 import { LogOut } from "lucide-react";
+import { Bell } from "lucide-react";
+import NotificationsModal from "../components/modals/NotificationsModal";
 
 export default function Header({ username, onLogout }) {
+
+  const [modalOpen, setModalOpen] = useState(null);
+
   return (
     <div className="p-4 bg-white shadow-sm flex items-center justify-between">
       <div className="flex items-center gap-3">
@@ -15,6 +21,11 @@ export default function Header({ username, onLogout }) {
         </div>
       </div>
 
+      <div className="flex items-center gap-8">
+      <div onClick={() => setModalOpen("notificacoes")} className="cursor-pointer">
+        <Bell className="text-green-600" />
+      </div>
+      
       <button
         onClick={onLogout}
         className="flex items-center gap-1 text-red-500 hover:text-red-600 transition"
@@ -22,6 +33,8 @@ export default function Header({ username, onLogout }) {
         <LogOut size={20} />
         <span className="text-sm font-medium">Sair</span>
       </button>
+      </div>
+      {modalOpen === "notificacoes" && <NotificationsModal onClose={() => setModalOpen(null)} />}
     </div>
   );
 }

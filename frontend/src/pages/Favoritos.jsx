@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Heart, Trash2 } from "lucide-react";
+import { Heart, Trash2, Building, Pill } from "lucide-react";
 import MenuDown from "../components/MenuDown";
 import Header from "../components/Header";
 
@@ -11,23 +11,10 @@ export default function Favoritos() {
     const nomeSalvo = localStorage.getItem("loggedUser");
     if (nomeSalvo) setUsername(nomeSalvo);
 
-    // Mock de favoritos salvos (depois pode vir do backend ou localStorage)
     const favoritosSalvos = [
-      {
-        tipo: "Medicamento",
-        nome: "Dipirona Sódica",
-        detalhe: "UBS Centro",
-      },
-      {
-        tipo: "Medicamento",
-        nome: "Amoxicilina",
-        detalhe: "UBS Boa Vista",
-      },
-      {
-        tipo: "Unidade",
-        nome: "UBS Jardim",
-        detalhe: "Rua Esperança, 45",
-      },
+      { tipo: "Medicamento", nome: "Dipirona Sódica", detalhe: "UBS Centro" },
+      { tipo: "Medicamento", nome: "Amoxicilina", detalhe: "UBS Boa Vista" },
+      { tipo: "Unidade", nome: "UBS Jardim", detalhe: "Rua Esperança, 45" },
     ];
     setFavoritos(favoritosSalvos);
   }, []);
@@ -39,15 +26,13 @@ export default function Favoritos() {
 
   const handleLogout = () => {
     localStorage.removeItem("loggedUser");
-    window.location.href = "/login"; // redireciona pra tela de login
+    window.location.href = "/login";
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col pb-24">
-      {/* Header */}
+    <div className="min-h-screen bg-gray-50 pb-24 flex flex-col">
       <Header username={username} onLogout={handleLogout} />
 
-      {/* Lista de Favoritos */}
       <div className="px-4 mt-5">
         {favoritos.length === 0 ? (
           <div className="text-center text-gray-500 mt-20">
@@ -55,27 +40,35 @@ export default function Favoritos() {
             <p>Você ainda não adicionou nenhum favorito.</p>
           </div>
         ) : (
-          <ul className="space-y-3">
+          <div className="space-y-3">
             {favoritos.map((item, index) => (
-              <li
+              <div
                 key={index}
-                className="bg-white rounded-2xl shadow p-4 flex justify-between items-center"
+                className="bg-white border border-gray-100 rounded-2xl shadow-sm p-4 flex justify-between items-center"
               >
-                <div>
-                  <p className="font-semibold text-gray-800">{item.nome}</p>
-                  <p className="text-xs text-gray-500">
-                    {item.tipo} — {item.detalhe}
-                  </p>
+                <div className="flex items-start gap-3">
+                  {item.tipo === "Medicamento" ? (
+                    <Pill className="w-5 h-5 text-green-600 mt-0.5" />
+                  ) : (
+                    <Building className="w-5 h-5 text-blue-600 mt-0.5" />
+                  )}
+                  <div>
+                    <p className="font-medium text-gray-800">{item.nome}</p>
+                    <p className="text-xs text-gray-500">
+                      {item.tipo} — {item.detalhe}
+                    </p>
+                  </div>
                 </div>
+
                 <button
                   onClick={() => removerFavorito(index)}
-                  className="text-red-500 hover:text-red-700 transition"
+                  className="text-gray-400 hover:text-red-600 transition"
                 >
                   <Trash2 size={18} />
                 </button>
-              </li>
+              </div>
             ))}
-          </ul>
+          </div>
         )}
       </div>
 

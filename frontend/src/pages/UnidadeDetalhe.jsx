@@ -21,14 +21,12 @@ export default function UnidadeDetalhe() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
-      {/* Header */}
       <div className="p-4 bg-white shadow-sm flex justify-between items-center">
         <ArrowLeft className="text-gray-700" onClick={() => navigate(-1)} />
         <h1 className="font-semibold">{unidade.nome}</h1>
         <Heart className="text-gray-700" />
       </div>
 
-      {/* Info principal */}
       <div className="bg-white m-4 p-4 rounded-2xl shadow">
         <div className="flex items-start gap-3">
           <Building className="text-green-600 w-6 h-6" />
@@ -42,7 +40,6 @@ export default function UnidadeDetalhe() {
         </div>
       </div>
 
-      {/* Insumos */}
       <div className="bg-white m-4 p-4 rounded-2xl shadow">
         <p className="font-semibold mb-3">Insumos Disponíveis</p>
         <div className="space-y-3">
@@ -61,7 +58,6 @@ export default function UnidadeDetalhe() {
         </div>
       </div>
 
-      {/* Contatos */}
       <div className="bg-white m-4 p-4 rounded-2xl shadow space-y-2">
         <div className="flex items-center gap-2 text-gray-700">
           <Phone size={18} />

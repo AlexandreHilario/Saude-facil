@@ -1,11 +1,16 @@
 import { ArrowLeft, Heart, MapPin, Building } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 export default function MedicamentoDetalhe() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // Mock — em produção você poderia buscar pelo ID
+  const [notificar, setNotificar] = useState(false);
+  const [lembrete, setLembrete] = useState("");
+  const [adicionarLembrete, setAdicionarLembrete] = useState(false);
+  const [favorito, setFavorito] = useState(false);
+
   const medicamento = {
     id,
     nome: "Insulina Regular",
@@ -44,20 +49,25 @@ export default function MedicamentoDetalhe() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
-      {/* Header */}
       <div className="p-4 bg-white shadow-sm flex justify-between items-center">
-        <ArrowLeft className="text-gray-700" onClick={() => navigate(-1)} />
+        <ArrowLeft
+          className="text-gray-700 cursor-pointer"
+          onClick={() => navigate(-1)}
+        />
         <h1 className="font-semibold">{medicamento.nome}</h1>
-        <Heart className="text-gray-700" />
+        <Heart
+          onClick={() => setFavorito(!favorito)}
+          className={`cursor-pointer transition ${
+            favorito ? "text-red-500 fill-red-500" : "text-gray-700"
+          }`}
+        />
       </div>
 
-      {/* Info do medicamento */}
       <div className="bg-white m-4 p-4 rounded-2xl shadow">
         <h2 className="font-semibold text-lg mb-2">{medicamento.nome}</h2>
         <p className="text-sm text-gray-600">{medicamento.descricao}</p>
       </div>
 
-      {/* Lista de unidades */}
       <div className="bg-white m-4 p-4 rounded-2xl shadow">
         <p className="font-semibold mb-3">Disponível em</p>
         <div className="space-y-3">
@@ -80,15 +90,53 @@ export default function MedicamentoDetalhe() {
 
               <div className="text-right">
                 {u.qtd === "Indisponível" ? (
-                  <p className="text-red-600 font-medium text-sm">Indisponível</p>
+                  <p className="text-red-600 font-medium text-sm">
+                    Indisponível
+                  </p>
                 ) : (
                   <p className="text-green-600 font-medium text-sm">{u.qtd}</p>
                 )}
-                <p className="text-xs text-gray-400">Atualizado {u.atualizado}</p>
+                <p className="text-xs text-gray-400">
+                  Atualizado {u.atualizado}
+                </p>
               </div>
             </div>
           ))}
         </div>
+      </div>
+
+      {/* NOVAS OPÇÕES */}
+      <div className="bg-white m-4 p-4 rounded-2xl shadow space-y-3">
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={notificar}
+            onChange={() => setNotificar(!notificar)}
+            className="w-4 h-4"
+          />
+          <span className="text-sm text-gray-700">
+            Deseja receber notificação quando disponível?
+          </span>
+        </label>
+
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={adicionarLembrete}
+            onChange={() => setAdicionarLembrete(!adicionarLembrete)}
+            className="w-4 h-4"
+          />
+          <span className="text-sm text-gray-700">Adicionar lembrete</span>
+        </label>
+
+        {adicionarLembrete && (
+          <textarea
+            value={lembrete}
+            onChange={(e) => setLembrete(e.target.value)}
+            placeholder="Escreva a mensagem do lembrete..."
+            className="w-full border border-gray-200 rounded-xl p-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+          />
+        )}
       </div>
     </div>
   );

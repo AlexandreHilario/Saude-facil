@@ -23,7 +23,7 @@ export default function HomePage() {
 
   const handleLogout = () => {
     localStorage.removeItem("loggedUser");
-    window.location.href = "/login"; // redireciona pra tela de login
+    window.location.href = "/login"; 
   };
 
   const medicamentos = [
@@ -43,18 +43,14 @@ export default function HomePage() {
     { nome: "UBS Santo Antônio", endereco: "Av. Bela Vista, 890", distancia: "2.8km" },
   ];
 
-  // 🔢 Contadores automáticos baseados nos dados mocados
   const totalMedicamentos = medicamentos.length;
   const totalUnidades = unidades.length;
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col pb-24">
-      {/* Header */}
       <Header username={username} onLogout={handleLogout} />
 
-      {/* Cards de Resumo */}
       <div className="px-4 grid grid-cols-2 gap-3 mt-4">
-        {/* Card Medicamentos */}
         <div
           className="bg-white rounded-2xl p-4 shadow cursor-pointer hover:bg-gray-50 transition"
           onClick={() => setShowMedicamentos(true)}
@@ -65,7 +61,6 @@ export default function HomePage() {
           </p>
         </div>
 
-        {/* Card Unidades */}
         <div
           className="bg-white rounded-2xl p-4 shadow cursor-pointer hover:bg-gray-50 transition"
           onClick={() => setShowUnidades(true)}
@@ -75,7 +70,6 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Categorias */}
       <div className="px-4 mt-6">
         <p className="font-semibold text-gray-800 mb-3">Categorias</p>
         <div className="grid grid-cols-3 gap-3">
@@ -101,7 +95,6 @@ export default function HomePage() {
 
       <MenuDown />
 
-      {/* MODAL - Medicamentos */}
       {showMedicamentos && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
           <div className="bg-white rounded-2xl shadow-lg p-5 w-11/12 max-w-md">
@@ -131,7 +124,6 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* MODAL - Unidades */}
       {showUnidades && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
           <div className="bg-white rounded-2xl shadow-lg p-5 w-11/12 max-w-md">

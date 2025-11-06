@@ -1,10 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { ArrowLeft } from "lucide-react";
 import Header from "../components/Header";
 import MenuDown from "../components/MenuDown";
+import { useNavigate } from "react-router-dom";
 
 export default function Servicos() {
   const [selectedServico, setSelectedServico] = useState(null);
   const [username, setUsername] = useState("Usuário");
+  const navigate = useNavigate();
+
+   useEffect(() => {
+      const nomeSalvo = localStorage.getItem("loggedUser");
+      if (nomeSalvo) setUsername(nomeSalvo);
+    }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("loggedUser");
@@ -41,8 +49,9 @@ export default function Servicos() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col pb-24">
       <Header username={username} onLogout={handleLogout} />
-
+      
       <div className="px-4 mt-4">
+        <ArrowLeft className="text-gray-700" onClick={() => navigate(-1)}/>
         <h2 className="text-xl font-semibold text-gray-800 mb-4">
           Serviços do SUS
         </h2>
@@ -63,7 +72,6 @@ export default function Servicos() {
 
       <MenuDown />
 
-      {/* Modal Detalhes */}
       {selectedServico && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
           <div className="bg-white rounded-2xl shadow-lg p-5 w-11/12 max-w-md">

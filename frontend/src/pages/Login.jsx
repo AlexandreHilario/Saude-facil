@@ -25,7 +25,8 @@ export default function Login() {
     }
 
     localStorage.setItem("loggedUser", user.username);
-    navigate("/"); // vai pra Home
+    localStorage.setItem("loggedEmail", user.email);
+    navigate("/");
   };
 
   return (

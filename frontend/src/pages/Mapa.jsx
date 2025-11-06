@@ -1,43 +1,72 @@
 import { useState } from "react";
-import { ArrowLeft, Search, Mic, Map as MapIcon, Home, Heart, User } from "lucide-react";
+import { Map as MapIcon } from "lucide-react";
 import MenuDown from "../components/MenuDown";
-import SearchBar from "../components/SearchBar"; 
+import SearchBar from "../components/SearchBar";
 import Header from "../components/Header";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+import iconUrl from "leaflet/dist/images/marker-icon.png";
+import iconShadow from "leaflet/dist/images/marker-shadow.png";
+
+let DefaultIcon = L.icon({
+  iconUrl,
+  shadowUrl: iconShadow,
+});
+L.Marker.prototype.options.icon = DefaultIcon;
 
 export default function Mapa() {
   const [username, setUsername] = useState("Usuário");
   const [query, setQuery] = useState("");
   const [expanded, setExpanded] = useState(false);
 
-  const mapSrc =
-    "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3957.192216631509!2d-34.92565918457137!3d-8.053893490455834!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x7ab1e6f4f3b6d2b%3A0x0!2z0JHQvtC70LDRgNCw0YXRg9C90L3QuNGP!5e0!3m2!1spt-BR!2sbr!4v1698730000000!5m2!1spt-BR!2sbr";
+  const unidades = [
+    {
+      id: 1,
+      nome: "Segsat - Recife Antigo",
+      endereco: "Rua do Apolo, 235 - Recife Antigo, Recife - PE",
+      latitude: -8.063420, 
+      longitude: -34.874223,
+    },
+  ];
 
   const handleLogout = () => {
     localStorage.removeItem("loggedUser");
-    window.location.href = "/login"; // redireciona pra tela de login
+    window.location.href = "/login";
   };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col pb-24">
       <Header username={username} onLogout={handleLogout} />
+
       <SearchBar
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Busque na sua localidade"
       />
 
-      <div className={`px-3 transition-all duration-200 ${expanded ? "flex-1" : ""}`}>
-        <div className={`bg-white rounded-lg overflow-hidden shadow-sm ${expanded ? "h-[calc(100vh-130px)]" : "h-64"}`}>
-          <iframe
-            title="Mapa - Recife"
-            src={mapSrc}
-            width="100%"
-            height="100%"
-            style={{ border: 0 }}
-            allowFullScreen=""
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-          />
+      <div className="px-3 transition-all duration-200 flex-1">
+        <div
+          className={`bg-white rounded-lg overflow-hidden shadow-sm ${
+            expanded ? "h-[calc(100vh-130px)]" : "h-96"
+          }`}
+        >
+          <MapContainer
+            center={[-8.063169, -34.871139]} 
+            zoom={15}
+            style={{ height: "100%", width: "100%" }}
+          >
+            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+            {unidades.map((u) => (
+              <Marker key={u.id} position={[u.latitude, u.longitude]}>
+                <Popup>
+                  <strong>{u.nome}</strong>
+                  <br />
+                  {u.endereco}
+                </Popup>
+              </Marker>
+            ))}
+          </MapContainer>
         </div>
 
         <div className="mt-4 flex justify-center">
@@ -49,7 +78,8 @@ export default function Mapa() {
           </button>
         </div>
       </div>
-      <MenuDown/>
+
+      <MenuDown />
     </div>
   );
 }

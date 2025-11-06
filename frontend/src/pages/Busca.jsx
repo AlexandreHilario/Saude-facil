@@ -45,19 +45,17 @@ export default function Busca() {
 
   const handleLogout = () => {
     localStorage.removeItem("loggedUser");
-    window.location.href = "/login"; // redireciona pra tela de login
+    window.location.href = "/login";
   };
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
-      {/* Header */}
       <Header username={username} onLogout={handleLogout} />
       <div className="p-4 bg-white flex items-center gap-3 shadow-sm">
         <ArrowLeft className="text-gray-700" onClick={() => navigate(-1)}/>
         <h1 className="font-semibold text-lg">Buscar</h1>
       </div>
 
-      {/* Filtros */}
       <div className="flex justify-around bg-white shadow-sm">
         <button
           onClick={() => {
@@ -87,12 +85,10 @@ export default function Busca() {
         </button>
       </div>
 
-      {/* Barra de busca */}
       <div className="px-4">
         <SearchBar value={query} onChange={(e) => setQuery(e.target.value)} />
       </div>
 
-      {/* Resultados */}
       <div className="p-4 space-y-3">
         {query.length > 0 ? (
           lista.length > 0 ? (
