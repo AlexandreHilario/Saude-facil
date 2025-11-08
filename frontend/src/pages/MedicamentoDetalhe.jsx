@@ -1,60 +1,64 @@
 import { ArrowLeft, Heart, MapPin, Building } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "../config/DataBase";
 
 export default function MedicamentoDetalhe() {
   const { id } = useParams();
   const navigate = useNavigate();
 
+  const [medicamento, setMedicamento] = useState(null);
+  const [unidades, setUnidades] = useState([]);
   const [notificar, setNotificar] = useState(false);
   const [lembrete, setLembrete] = useState("");
   const [adicionarLembrete, setAdicionarLembrete] = useState(false);
   const [favorito, setFavorito] = useState(false);
 
-  const medicamento = {
-    id,
-    nome: "Insulina Regular",
-    descricao:
-      "A Insulina Regular é um tipo de insulina de ação rápida utilizada para controlar os níveis de glicose no sangue em pessoas com diabetes.",
-    unidades: [
-      {
-        id: 1,
-        nome: "UBS Centro",
-        endereco: "Rua das Flores, 123 - Centro",
-        distancia: "2km",
-        qtd: "101 unid.",
-        atualizado: "há 1h",
-        horario: "Aberto até 17h",
-      },
-      {
-        id: 2,
-        nome: "UBS Boa Vista",
-        endereco: "Av. Paulista, 210",
-        distancia: "3km",
-        qtd: "58 unid.",
-        atualizado: "há 2h",
-        horario: "Aberto até 16h",
-      },
-      {
-        id: 3,
-        nome: "UBS Aurora",
-        endereco: "Av. Recife, 1200",
-        distancia: "6km",
-        qtd: "Indisponível",
-        atualizado: "há 5h",
-        horario: "Fechada",
-      },
-    ],
-  };
+  useEffect(() => {
+    const fetchMedicamento = async () => {
+      const { data: med, error: medError } = await supabase
+        .from("medicamentos")
+        .select("*")
+        .eq("id_medicamento", id)
+        .single();
+
+      if (medError) console.error("Erro medicamento:", medError);
+      else setMedicamento(med);
+
+      // Só busca unidades se o medicamento estiver disponível
+      if (med?.disponivel) {
+        const { data: unidadesData, error: unidError } = await supabase
+          .from("estoque")
+          .select(`
+            quantidade_estoque,
+            unidades (
+              id_unidade,
+              nome_unidade,
+              endereco,
+              cidade
+            )
+          `)
+          .eq("id_medicamento", id);
+
+        if (unidError) console.error("Erro unidades:", unidError);
+        else setUnidades(unidadesData);
+      }
+    };
+
+    fetchMedicamento();
+  }, [id]);
+
+  if (!medicamento) return <p className="p-4">Carregando...</p>;
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
+      {/* Header */}
       <div className="p-4 bg-white shadow-sm flex justify-between items-center">
         <ArrowLeft
           className="text-gray-700 cursor-pointer"
           onClick={() => navigate(-1)}
         />
-        <h1 className="font-semibold">{medicamento.nome}</h1>
+        <h1 className="font-semibold">{medicamento.nome_medicamento}</h1>
         <Heart
           onClick={() => setFavorito(!favorito)}
           className={`cursor-pointer transition ${
@@ -63,49 +67,67 @@ export default function MedicamentoDetalhe() {
         />
       </div>
 
+      {/* Info principal */}
       <div className="bg-white m-4 p-4 rounded-2xl shadow">
-        <h2 className="font-semibold text-lg mb-2">{medicamento.nome}</h2>
-        <p className="text-sm text-gray-600">{medicamento.descricao}</p>
-      </div>
-
-      <div className="bg-white m-4 p-4 rounded-2xl shadow">
-        <p className="font-semibold mb-3">Disponível em</p>
-        <div className="space-y-3">
-          {medicamento.unidades.map((u) => (
-            <div
-              key={u.id}
-              className="border border-gray-100 rounded-xl p-3 flex justify-between items-center"
-            >
-              <div className="flex flex-col">
-                <div className="flex items-center gap-2">
-                  <Building className="w-4 h-4 text-green-600" />
-                  <p className="font-medium">{u.nome}</p>
-                </div>
-                <p className="text-xs text-gray-500">{u.endereco}</p>
-                <div className="flex items-center text-xs text-gray-400 mt-1">
-                  <MapPin className="w-3 h-3 mr-1" />
-                  {u.distancia} • {u.horario}
-                </div>
-              </div>
-
-              <div className="text-right">
-                {u.qtd === "Indisponível" ? (
-                  <p className="text-red-600 font-medium text-sm">
-                    Indisponível
-                  </p>
-                ) : (
-                  <p className="text-green-600 font-medium text-sm">{u.qtd}</p>
-                )}
-                <p className="text-xs text-gray-400">
-                  Atualizado {u.atualizado}
-                </p>
-              </div>
-            </div>
-          ))}
+        <h2 className="font-semibold text-lg mb-2">
+          {medicamento.nome_medicamento}
+        </h2>
+        <p className="text-sm text-gray-600">
+          {medicamento.principio_ativo || "Sem descrição detalhada"}
+        </p>
+        <div className="mt-2 text-sm text-gray-700">
+          <p>
+            <strong>Validade:</strong>{" "}
+            {medicamento.validade
+              ? new Date(medicamento.validade).toLocaleDateString("pt-BR")
+              : "Não informada"}
+          </p>
+          <p>
+            <strong>Disponível:</strong>{" "}
+            {medicamento.disponivel ? "Sim" : "Não"}
+          </p>
         </div>
       </div>
 
-      {/* NOVAS OPÇÕES */}
+      {/* Disponibilidade */}
+      <div className="bg-white m-4 p-4 rounded-2xl shadow">
+        <p className="font-semibold mb-3">Disponível em</p>
+
+        {!medicamento.disponivel ? (
+          <p className="text-sm text-red-500">
+            Este medicamento não está disponível no momento.
+          </p>
+        ) : (
+          <div className="space-y-3 max-h-64 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 rounded-xl">
+            {unidades.length === 0 ? (
+              <p className="text-sm text-gray-500">Nenhuma unidade disponível</p>
+            ) : (
+              unidades.map((item, i) => (
+                <div
+                  key={i}
+                  className="border border-gray-100 rounded-xl p-3 flex justify-between items-center bg-gray-50 hover:bg-gray-100 transition"
+                >
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-2">
+                      <Building className="w-4 h-4 text-green-600" />
+                      <p className="font-medium">{item.unidades.nome_unidade}</p>
+                    </div>
+                    <p className="text-xs text-gray-500">
+                      {item.unidades.endereco} - {item.unidades.cidade}
+                    </p>
+                    <div className="flex items-center text-xs text-gray-400 mt-1">
+                      <MapPin className="w-3 h-3 mr-1" />
+                      {item.quantidade_estoque} unidades
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Lembrete / Notificação */}
       <div className="bg-white m-4 p-4 rounded-2xl shadow space-y-3">
         <label className="flex items-center gap-2">
           <input
