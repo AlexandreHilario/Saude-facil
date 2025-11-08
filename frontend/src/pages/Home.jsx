@@ -1,47 +1,60 @@
 import { useState, useEffect } from "react";
-import {
-  Home,
-  Map,
-  Heart,
-  User,
-  Package,
-  Syringe,
-  Baby,
-} from "lucide-react";
+import { Map, Pill } from "lucide-react";
 import MenuDown from "../components/MenuDown";
 import Header from "../components/Header";
+import { supabase } from "../config/DataBase";
 
 export default function HomePage() {
   const [username, setUsername] = useState("Usuário");
   const [showMedicamentos, setShowMedicamentos] = useState(false);
   const [showUnidades, setShowUnidades] = useState(false);
+  const [unidades, setUnidades] = useState([]);
+  const [medicamentos, setMedicamentos] = useState([]);
+  const [categorias, setCategorias] = useState([]);
+  const [categoriaSelecionada, setCategoriaSelecionada] = useState(null);
+  const [medsPorCategoria, setMedsPorCategoria] = useState([]);
 
   useEffect(() => {
     const nomeSalvo = localStorage.getItem("loggedUser");
     if (nomeSalvo) setUsername(nomeSalvo);
+
+    const fetchData = async () => {
+      // Busca unidades
+      const { data: unids, error: unidsError } = await supabase
+        .from("unidades")
+        .select("*");
+      if (unidsError) console.error("Erro ao buscar unidades:", unidsError);
+      else setUnidades(unids || []);
+
+      // Busca medicamentos disponíveis
+      const { data: meds, error: medsError } = await supabase
+        .from("medicamentos")
+        .select("*")
+        .eq("disponivel", true);
+      if (medsError) console.error("Erro ao buscar medicamentos:", medsError);
+      else {
+        setMedicamentos(meds || []);
+        // Extrai categorias únicas
+        const cats = [...new Set(meds.map((m) => m.categoria))];
+        setCategorias(cats);
+      }
+    };
+
+    fetchData();
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("loggedUser");
-    window.location.href = "/login"; 
+    window.location.href = "/login";
   };
 
-  const medicamentos = [
-    { nome: "Dipirona Sódica", qtd: "12 caixas", unidade: "UBS Centro" },
-    { nome: "Amoxicilina", qtd: "8 caixas", unidade: "UBS Boa Vista" },
-    { nome: "Paracetamol", qtd: "15 caixas", unidade: "UBS Recife" },
-    { nome: "Insulina NPH", qtd: "Indisponível", unidade: "UBS Norte" },
-    { nome: "Omeprazol", qtd: "20 caixas", unidade: "UBS Jardim" },
-    { nome: "Metformina", qtd: "10 caixas", unidade: "UBS Santo Antônio" },
-  ];
-
-  const unidades = [
-    { nome: "UBS Centro", endereco: "Rua das Flores, 123", distancia: "2km" },
-    { nome: "UBS Boa Vista", endereco: "Av. Paulista, 210", distancia: "3km" },
-    { nome: "UBS Recife", endereco: "Rua Mirabela, 180", distancia: "4km" },
-    { nome: "UBS Jardim", endereco: "Rua Esperança, 45", distancia: "3.2km" },
-    { nome: "UBS Santo Antônio", endereco: "Av. Bela Vista, 890", distancia: "2.8km" },
-  ];
+  const abrirModalCategoria = (categoria) => {
+    setCategoriaSelecionada(categoria);
+    const filtrados = medicamentos.filter(
+      (m) => m.categoria === categoria && m.disponivel
+    );
+    setMedsPorCategoria(filtrados);
+  };
 
   const totalMedicamentos = medicamentos.length;
   const totalUnidades = unidades.length;
@@ -56,9 +69,7 @@ export default function HomePage() {
           onClick={() => setShowMedicamentos(true)}
         >
           <p className="text-gray-500 text-sm">Medicamentos Disponíveis</p>
-          <p className="text-2xl font-bold text-green-700">
-            {totalMedicamentos}
-          </p>
+          <p className="text-2xl font-bold text-green-700">{totalMedicamentos}</p>
         </div>
 
         <div
@@ -73,20 +84,24 @@ export default function HomePage() {
       <div className="px-4 mt-6">
         <p className="font-semibold text-gray-800 mb-3">Categorias</p>
         <div className="grid grid-cols-3 gap-3">
-          <div className="bg-white rounded-2xl p-4 flex flex-col items-center shadow">
-            <Package className="text-green-600" />
-            <p className="text-sm mt-1">Medicamentos</p>
-          </div>
-          <div className="bg-white rounded-2xl p-4 flex flex-col items-center shadow">
-            <Syringe className="text-green-600" />
-            <p className="text-sm mt-1">Insulina</p>
-          </div>
-          <div className="bg-white rounded-2xl p-4 flex flex-col items-center shadow">
-            <Baby className="text-green-600" />
-            <p className="text-sm mt-1">Fraldas</p>
-          </div>
-          <div className="bg-white rounded-2xl p-4 flex flex-col items-center shadow cursor-pointer hover:bg-gray-50 transition"
-              onClick={() => window.location.href = "/servicos"}>
+          
+          {categorias.map((cat, index) => (
+            <div
+              key={index}
+              className="bg-white rounded-2xl p-4 flex flex-col items-center shadow cursor-pointer hover:bg-gray-50 transition"
+              onClick={() => abrirModalCategoria(cat)}
+            >
+              <Pill className="text-green-600"/>
+              <p className="text-sm text-center font-medium text-gray-700">
+                {cat}
+              </p>
+            </div>
+          ))}
+
+          <div
+            className="bg-white rounded-2xl p-4 flex flex-col items-center shadow cursor-pointer hover:bg-gray-50 transition"
+            onClick={() => (window.location.href = "/servicos")}
+          >
             <Map className="text-green-600" />
             <p className="text-sm mt-1">Serviços</p>
           </div>
@@ -95,6 +110,7 @@ export default function HomePage() {
 
       <MenuDown />
 
+      {/* Modal geral de medicamentos */}
       {showMedicamentos && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
           <div className="bg-white rounded-2xl shadow-lg p-5 w-11/12 max-w-md">
@@ -102,17 +118,29 @@ export default function HomePage() {
               Medicamentos Disponíveis
             </h2>
             <ul className="space-y-3 max-h-60 overflow-y-auto">
-              {medicamentos.map((m, index) => (
-                <li
-                  key={index}
-                  className="border-b border-gray-100 pb-2 text-sm text-gray-700"
-                >
-                  <p className="font-medium">{m.nome}</p>
-                  <p className="text-xs text-gray-500">
-                    {m.qtd} — {m.unidade}
-                  </p>
-                </li>
-              ))}
+              {medicamentos.length === 0 ? (
+                <p className="text-sm text-gray-500">
+                  Nenhum medicamento disponível no momento.
+                </p>
+              ) : (
+                medicamentos.map((m, index) => (
+                  <li
+                    key={index}
+                    className="border-b border-gray-100 pb-2 text-sm text-gray-700"
+                  >
+                    <p className="font-medium">{m.nome_medicamento}</p>
+                    <p className="text-xs text-gray-500">
+                      Categoria: {m.categoria}
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      Validade:{" "}
+                      {m.validade
+                        ? new Date(m.validade).toLocaleDateString("pt-BR")
+                        : "Não informada"}
+                    </p>
+                  </li>
+                ))
+              )}
             </ul>
             <button
               className="mt-4 bg-green-600 text-white px-4 py-2 rounded-lg w-full"
@@ -124,6 +152,46 @@ export default function HomePage() {
         </div>
       )}
 
+      {/* Modal de categoria */}
+      {categoriaSelecionada && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+          <div className="bg-white rounded-2xl shadow-lg p-5 w-11/12 max-w-md">
+            <h2 className="text-lg font-semibold mb-3 text-gray-800">
+              {categoriaSelecionada}
+            </h2>
+            <ul className="space-y-3 max-h-60 overflow-y-auto">
+              {medsPorCategoria.length === 0 ? (
+                <p className="text-sm text-gray-500">
+                  Nenhum medicamento disponível nesta categoria.
+                </p>
+              ) : (
+                medsPorCategoria.map((m, index) => (
+                  <li
+                    key={index}
+                    className="border-b border-gray-100 pb-2 text-sm text-gray-700"
+                  >
+                    <p className="font-medium">{m.nome_medicamento}</p>
+                    <p className="text-xs text-gray-500">
+                      Validade:{" "}
+                      {m.validade
+                        ? new Date(m.validade).toLocaleDateString("pt-BR")
+                        : "Não informada"}
+                    </p>
+                  </li>
+                ))
+              )}
+            </ul>
+            <button
+              className="mt-4 bg-green-600 text-white px-4 py-2 rounded-lg w-full"
+              onClick={() => setCategoriaSelecionada(null)}
+            >
+              Fechar
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de unidades */}
       {showUnidades && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
           <div className="bg-white rounded-2xl shadow-lg p-5 w-11/12 max-w-md">
@@ -131,17 +199,23 @@ export default function HomePage() {
               Unidades Próximas
             </h2>
             <ul className="space-y-3 max-h-60 overflow-y-auto">
-              {unidades.map((u, index) => (
-                <li
-                  key={index}
-                  className="border-b border-gray-100 pb-2 text-sm text-gray-700"
-                >
-                  <p className="font-medium">{u.nome}</p>
-                  <p className="text-xs text-gray-500">
-                    {u.endereco} — {u.distancia}
-                  </p>
-                </li>
-              ))}
+              {unidades.length === 0 ? (
+                <p className="text-sm text-gray-500">
+                  Nenhuma unidade cadastrada.
+                </p>
+              ) : (
+                unidades.map((u, index) => (
+                  <li
+                    key={index}
+                    className="border-b border-gray-100 pb-2 text-sm text-gray-700"
+                  >
+                    <p className="font-medium">{u.nome_unidade}</p>
+                    <p className="text-xs text-gray-500">
+                      {u.endereco} — {u.cidade}
+                    </p>
+                  </li>
+                ))
+              )}
             </ul>
             <button
               className="mt-4 bg-green-600 text-white px-4 py-2 rounded-lg w-full"
