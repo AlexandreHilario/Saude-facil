@@ -61,7 +61,7 @@ export default function Favoritos() {
 
   const handleLogout = () => {
     localStorage.removeItem("loggedUserData");
-    navigate("/");
+    navigate("/login");
   };
 
   return (

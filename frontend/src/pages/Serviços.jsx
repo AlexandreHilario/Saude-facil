@@ -36,7 +36,7 @@ export default function Servicos() {
 
   const handleLogout = () => {
     localStorage.removeItem("loggedUserData");
-    navigate("/");
+    navigate("/login");
   };
 
   return (

@@ -71,7 +71,7 @@ export default function Busca() {
 
   const handleLogout = () => {
     localStorage.removeItem("loggedUserData");
-    window.location.href = "/";
+    window.location.href = "/login";
   };
 
   return (

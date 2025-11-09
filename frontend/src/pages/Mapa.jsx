@@ -74,7 +74,7 @@ export default function Mapa() {
 
   const handleLogout = () => {
     localStorage.removeItem("loggedUserData");
-    navigate("/");
+    navigate("/login");
   };
 
   const defaultCenter = userLocation
