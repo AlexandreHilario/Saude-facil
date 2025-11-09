@@ -2,6 +2,7 @@ import { useState } from "react";
 import { LogOut } from "lucide-react";
 import { Bell } from "lucide-react";
 import RemindersModal from "./modals/RemindersModal";
+import avatar from "../../assets/avatar.png";
 
 export default function Header({ username, onLogout }) {
 
@@ -11,7 +12,7 @@ export default function Header({ username, onLogout }) {
     <div className="p-4 bg-white shadow-sm flex items-center justify-between">
       <div className="flex items-center gap-3">
         <img
-          src="../../assets/avatar.png"
+          src={avatar}
           alt="Avatar"
           className="w-10 h-10 rounded-full"
         />

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import Logo from "../../assets/Vector.svg";
+import { supabase } from "../config/DataBase";
 
 export default function Cadastro() {
   const [showPassword, setShowPassword] = useState(false);
@@ -10,24 +12,40 @@ export default function Cadastro() {
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
 
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-    const userExists = users.some(
-      (u) => u.email === email || u.username === username
-    );
+    const { data: existingUsers, error: selectError } = await supabase
+      .from("usuarios")
+      .select("*")
+      .or(`email.eq.${email},nome_usuario.eq.${username}`);
 
-    if (userExists) {
+    if (selectError) {
+      console.error(selectError);
+      setMessage("Erro ao verificar usuários existentes.");
+      return;
+    }
+
+    if (existingUsers.length > 0) {
       setMessage("Usuário ou e-mail já cadastrado.");
       return;
     }
 
-    const newUser = { username, email, password };
-    users.push(newUser);
-    localStorage.setItem("users", JSON.stringify(users));
+    const { error: insertError } = await supabase.from("usuarios").insert([
+      {
+        nome_usuario: username,
+        email: email,
+        senha: password,
+      },
+    ]);
 
-    setMessage(" Cadastro realizado com sucesso!");
+    if (insertError) {
+      console.error(insertError);
+      setMessage("Erro ao cadastrar. Tente novamente.");
+      return;
+    }
+
+    setMessage("Cadastro realizado com sucesso!");
     setTimeout(() => navigate("/login"), 1500);
   };
 
@@ -36,7 +54,7 @@ export default function Cadastro() {
       <div className="bg-green-700 text-white w-full max-w-sm rounded-2xl flex flex-col items-center py-10">
         <div className="bg-white p-4 rounded-full mb-6">
           <img
-            src="../../assets/Vector.svg"
+            src={Logo}
             alt="Logo"
             className="w-10 h-10"
           />

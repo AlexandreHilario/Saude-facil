@@ -17,8 +17,11 @@ export default function ProfilePage() {
       setUsername(parsed.nome_usuario || "Usuário");
     }
 
-    const emailSalvo = localStorage.getItem("loggedEmail");
-    if (emailSalvo) setEmail(emailSalvo);
+    const emailSalvo = localStorage.getItem("loggedUserData");
+    if (emailSalvo) {
+      const parsed = JSON.parse(emailSalvo);
+      setEmail(parsed.email);
+    }
   }, []);
 
   const handleLogout = () => {

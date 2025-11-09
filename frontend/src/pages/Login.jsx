@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "../config/DataBase";
+import Logo from "../../assets/Vector.svg";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -8,16 +10,21 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
-    const users = JSON.parse(localStorage.getItem("users")) || [];
+    const { data: users, error } = await supabase
+      .from("usuarios")
+      .select("*")
+      .or(`email.eq.${emailOrUser},nome_usuario.eq.${emailOrUser}`);
 
-    const user = users.find(
-      (u) =>
-        (u.email === emailOrUser || u.username === emailOrUser) &&
-        u.password === password
-    );
+    if (error) {
+      console.error(error);
+      alert("Erro ao acessar o banco!");
+      return;
+    }
+
+    const user = users.find((u) => u.senha === password);
 
     if (!user) {
       alert("Login ou senha incorretos!");
@@ -27,12 +34,12 @@ export default function Login() {
     localStorage.setItem(
       "loggedUserData",
       JSON.stringify({
-        id_usuario: user.id_usuario || 1, 
-        nome_usuario: user.username,
+        id_usuario: user.id_usuario,
+        nome_usuario: user.nome_usuario,
         email: user.email,
       })
     );
-    
+
     navigate("/");
   };
 
@@ -41,7 +48,7 @@ export default function Login() {
       <div className="bg-green-700 text-white w-full max-w-sm rounded-2xl flex flex-col items-center py-10">
         <div className="bg-white p-4 rounded-full mb-6">
           <img
-            src="../../assets/Vector.svg"
+            src={Logo}
             alt="Logo"
             className="w-10 h-10"
           />
