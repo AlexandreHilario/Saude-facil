@@ -34,7 +34,7 @@ export default function Servicos() {
 
   const handleLogout = () => {
     localStorage.removeItem("loggedUserData");
-    window.location.href = "/login";
+    window.location.href = "/";
   };
 
   return (

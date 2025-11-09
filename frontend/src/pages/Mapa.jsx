@@ -71,8 +71,8 @@ export default function Mapa() {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("loggedUser");
-    window.location.href = "/login";
+    localStorage.removeItem("loggedUserData");
+    window.location.href = "/";
   };
 
   const defaultCenter = userLocation

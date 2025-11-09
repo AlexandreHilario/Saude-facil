@@ -44,7 +44,7 @@ export default function HomePage() {
 
   const handleLogout = () => {
     localStorage.removeItem("loggedUserData");
-    window.location.href = "/login";
+    window.location.href = "/";
   };
 
   const abrirModalCategoria = (categoria) => {

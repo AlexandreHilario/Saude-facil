@@ -58,9 +58,8 @@ export default function Favoritos() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("loggedUser");
     localStorage.removeItem("loggedUserData");
-    window.location.href = "/login";
+    window.location.href = "/";
   };
 
   return (
