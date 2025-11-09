@@ -7,6 +7,7 @@ import L from "leaflet";
 import { supabase } from "../config/DataBase";
 import iconUrl from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
+import { useNavigate } from "react-router-dom";
 
 const defaultIcon = L.icon({
   iconUrl,
@@ -40,6 +41,7 @@ export default function Mapa() {
   const [unidades, setUnidades] = useState([]);
   const [userLocation, setUserLocation] = useState(null);
   const [expanded, setExpanded] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const userData = localStorage.getItem("loggedUserData");
@@ -72,7 +74,7 @@ export default function Mapa() {
 
   const handleLogout = () => {
     localStorage.removeItem("loggedUserData");
-    window.location.href = "/";
+    navigate("/");
   };
 
   const defaultCenter = userLocation

@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import Header from "../components/Header";
 import MenuDown from "../components/MenuDown";
 import { supabase } from "../config/DataBase";
+import { useNavigate } from "react-router-dom";
 
 export default function Servicos() {
   const [servicos, setServicos] = useState([]);
   const [selectedServico, setSelectedServico] = useState(null);
   const [username, setUsername] = useState("Usuário");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const nomeSalvo = JSON.parse(localStorage.getItem("loggedUserData"));
@@ -34,7 +36,7 @@ export default function Servicos() {
 
   const handleLogout = () => {
     localStorage.removeItem("loggedUserData");
-    window.location.href = "/";
+    navigate("/");
   };
 
   return (

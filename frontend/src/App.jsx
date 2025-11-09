@@ -15,11 +15,9 @@ export default function App() {
   return (
     <Router>
       <Routes>
-        {/* Rotas Públicas */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Cadastro />} />
 
-        {/* Rotas Protegidas */}
         <Route
           path="/"
           element={

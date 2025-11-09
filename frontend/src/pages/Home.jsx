@@ -3,6 +3,7 @@ import { Map, Pill } from "lucide-react";
 import MenuDown from "../components/MenuDown";
 import Header from "../components/Header";
 import { supabase } from "../config/DataBase";
+import { useNavigate } from "react-router-dom";
 
 export default function HomePage() {
   const [username, setUsername] = useState("Usuário");
@@ -13,6 +14,7 @@ export default function HomePage() {
   const [categorias, setCategorias] = useState([]);
   const [categoriaSelecionada, setCategoriaSelecionada] = useState(null);
   const [medsPorCategoria, setMedsPorCategoria] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const userData = localStorage.getItem("loggedUserData");
@@ -44,7 +46,7 @@ export default function HomePage() {
 
   const handleLogout = () => {
     localStorage.removeItem("loggedUserData");
-    window.location.href = "/";
+    navigate("/");
   };
 
   const abrirModalCategoria = (categoria) => {
@@ -99,7 +101,7 @@ export default function HomePage() {
 
           <div
             className="bg-white rounded-2xl p-4 flex flex-col items-center shadow cursor-pointer hover:bg-gray-50 transition"
-            onClick={() => (window.location.href = "/servicos")}
+            onClick={() => navigate("/servicos")}
           >
             <Map className="text-green-600" />
             <p className="text-sm mt-1">Serviços</p>

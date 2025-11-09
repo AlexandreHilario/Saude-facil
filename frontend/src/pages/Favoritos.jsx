@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import { Heart, Trash2, Building, Pill } from "lucide-react";
 import MenuDown from "../components/MenuDown";
 import Header from "../components/Header";
-import { supabase } from "../config/DataBase"; // 👈 IMPORTANTE
+import { supabase } from "../config/DataBase"; 
+import { useNavigate } from "react-router-dom";
 
 export default function Favoritos() {
   const [username, setUsername] = useState("Usuário");
   const [favoritos, setFavoritos] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchFavoritos = async () => {
@@ -59,7 +61,7 @@ export default function Favoritos() {
 
   const handleLogout = () => {
     localStorage.removeItem("loggedUserData");
-    window.location.href = "/";
+    navigate("/");
   };
 
   return (
