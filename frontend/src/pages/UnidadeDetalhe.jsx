@@ -12,7 +12,6 @@ export default function UnidadeDetalhe() {
 
   useEffect(() => {
     const fetchData = async () => {
-      // Busca dados da unidade
       const { data: unidadeData, error: unidadeError } = await supabase
         .from("unidades")
         .select("*")
@@ -22,7 +21,6 @@ export default function UnidadeDetalhe() {
       if (unidadeError) console.error("Erro ao buscar unidade:", unidadeError);
       else setUnidade(unidadeData);
 
-      // Busca insumos (medicamentos e quantidades dessa unidade)
       const { data: estoqueData, error: estoqueError } = await supabase
         .from("estoque")
         .select(
@@ -62,7 +60,6 @@ export default function UnidadeDetalhe() {
           onClick={() => navigate(-1)}
         />
         <h1 className="font-semibold">{unidade.nome_unidade}</h1>
-        <Heart className="text-gray-700" />
       </div>
 
       <div className="bg-white m-4 p-4 rounded-2xl shadow">

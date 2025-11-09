@@ -19,7 +19,7 @@ export default function Cadastro() {
     );
 
     if (userExists) {
-      setMessage("⚠️ Usuário ou e-mail já cadastrado.");
+      setMessage("Usuário ou e-mail já cadastrado.");
       return;
     }
 
@@ -27,7 +27,7 @@ export default function Cadastro() {
     users.push(newUser);
     localStorage.setItem("users", JSON.stringify(users));
 
-    setMessage("✅ Cadastro realizado com sucesso!");
+    setMessage(" Cadastro realizado com sucesso!");
     setTimeout(() => navigate("/login"), 1500);
   };
 

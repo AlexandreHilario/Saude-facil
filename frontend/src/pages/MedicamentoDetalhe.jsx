@@ -14,6 +14,36 @@ export default function MedicamentoDetalhe() {
   const [adicionarLembrete, setAdicionarLembrete] = useState(false);
   const [favorito, setFavorito] = useState(false);
 
+  const user = JSON.parse(localStorage.getItem("loggedUserData")); 
+  const userId = user?.id_usuario;
+
+  const handleFavoritar = async () => {
+    if (!userId) return alert("Usuário não autenticado.");
+  
+    if (favorito) {
+      const { error } = await supabase
+        .from("favoritos")
+        .delete()
+        .eq("id_usuario", userId)
+        .eq("id_medicamento", id);
+  
+      if (!error) setFavorito(false);
+      else console.error("Erro ao remover favorito:", error);
+    } else {
+      const { error } = await supabase.from("favoritos").insert([
+        {
+          id_usuario: userId,
+          id_medicamento: id,
+          tipo: "Medicamento",
+          detalhe: "Favorito adicionado via app",
+        },
+      ]);
+  
+      if (!error) setFavorito(true);
+      else console.error("Erro ao adicionar favorito:", error);
+    }
+  };
+
   useEffect(() => {
     const fetchMedicamento = async () => {
       const { data: med, error: medError } = await supabase
@@ -25,7 +55,6 @@ export default function MedicamentoDetalhe() {
       if (medError) console.error("Erro medicamento:", medError);
       else setMedicamento(med);
 
-      // Só busca unidades se o medicamento estiver disponível
       if (med?.disponivel) {
         const { data: unidadesData, error: unidError } = await supabase
           .from("estoque")
@@ -52,7 +81,6 @@ export default function MedicamentoDetalhe() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
-      {/* Header */}
       <div className="p-4 bg-white shadow-sm flex justify-between items-center">
         <ArrowLeft
           className="text-gray-700 cursor-pointer"
@@ -60,14 +88,13 @@ export default function MedicamentoDetalhe() {
         />
         <h1 className="font-semibold">{medicamento.nome_medicamento}</h1>
         <Heart
-          onClick={() => setFavorito(!favorito)}
+          onClick={handleFavoritar}
           className={`cursor-pointer transition ${
             favorito ? "text-red-500 fill-red-500" : "text-gray-700"
           }`}
         />
       </div>
 
-      {/* Info principal */}
       <div className="bg-white m-4 p-4 rounded-2xl shadow">
         <h2 className="font-semibold text-lg mb-2">
           {medicamento.nome_medicamento}
@@ -88,8 +115,7 @@ export default function MedicamentoDetalhe() {
           </p>
         </div>
       </div>
-
-      {/* Disponibilidade */}
+      
       <div className="bg-white m-4 p-4 rounded-2xl shadow">
         <p className="font-semibold mb-3">Disponível em</p>
 
@@ -127,7 +153,6 @@ export default function MedicamentoDetalhe() {
         )}
       </div>
 
-      {/* Lembrete / Notificação */}
       <div className="bg-white m-4 p-4 rounded-2xl shadow space-y-3">
         <label className="flex items-center gap-2">
           <input
@@ -152,12 +177,40 @@ export default function MedicamentoDetalhe() {
         </label>
 
         {adicionarLembrete && (
-          <textarea
-            value={lembrete}
-            onChange={(e) => setLembrete(e.target.value)}
-            placeholder="Escreva a mensagem do lembrete..."
-            className="w-full border border-gray-200 rounded-xl p-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-          />
+          <div className="space-y-2">
+            <textarea
+              value={lembrete}
+              onChange={(e) => setLembrete(e.target.value)}
+              placeholder="Escreva a mensagem do lembrete..."
+              className="w-full border border-gray-200 rounded-xl p-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+            <button
+              onClick={async () => {
+                if (!userId) return alert("Usuário não autenticado.");
+                if (!lembrete.trim()) return alert("Digite uma mensagem.");
+
+                const { error } = await supabase.from("lembretes").insert([
+                  {
+                    id_usuario: userId,
+                    id_medicamento: id,
+                    mensagem: lembrete.trim(),
+                  },
+                ]);
+
+                if (error) {
+                  console.error("Erro ao salvar lembrete:", error);
+                  alert("Erro ao salvar lembrete.");
+                } else {
+                  alert("Lembrete salvo com sucesso!");
+                  setLembrete("");
+                  setAdicionarLembrete(false);
+                }
+              }}
+              className="bg-green-600 text-white w-full py-2 rounded-xl hover:bg-green-700 transition"
+            >
+              Salvar lembrete
+            </button>
+          </div>
         )}
       </div>
     </div>

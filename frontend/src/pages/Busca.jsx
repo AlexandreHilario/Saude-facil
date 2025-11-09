@@ -15,8 +15,12 @@ export default function Busca() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const userData = localStorage.getItem("loggedUserData");
+    if (userData) {
+      const parsed = JSON.parse(userData);
+      setUsername(parsed.nome_usuario || "Usuário");
+    }
     const fetchData = async () => {
-      // busca medicamentos
       const { data: meds, error: medsError } = await supabase
         .from("medicamentos")
         .select("*");
@@ -26,7 +30,6 @@ export default function Busca() {
         return;
       }
 
-      // busca estoque
       const { data: estoques, error: estError } = await supabase
         .from("estoque")
         .select("*");
@@ -36,7 +39,6 @@ export default function Busca() {
         return;
       }
 
-      // combina medicamentos + estoque
       const medicamentosComEstoque = meds.map((m) => {
         const estoque = estoques.find((e) => e.id_medicamento === m.id_medicamento);
         return {
@@ -47,7 +49,6 @@ export default function Busca() {
 
       setMedicamentos(medicamentosComEstoque);
 
-      // busca unidades
       const { data: unis, error: unisError } = await supabase
         .from("unidades")
         .select("*");
@@ -57,11 +58,6 @@ export default function Busca() {
     };
 
     fetchData();
-  }, []);
-
-  useEffect(() => {
-    const nomeSalvo = localStorage.getItem("loggedUser");
-    if (nomeSalvo) setUsername(nomeSalvo);
   }, []);
 
   const lista =

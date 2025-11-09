@@ -3,7 +3,6 @@ import { Bell, Settings, Calendar, User } from "lucide-react";
 import Header from "../components/Header";
 import MenuDown from "../components/MenuDown";
 import ConfigModal from "../components/modals/ConfigModal";
-import NotificationsModal from "../components/modals/NotificationsModal";
 import RemindersModal from "../components/modals/RemindersModal";
 
 export default function ProfilePage() {
@@ -12,15 +11,18 @@ export default function ProfilePage() {
   const [modalOpen, setModalOpen] = useState(null);
 
   useEffect(() => {
-    const nomeSalvo = localStorage.getItem("loggedUser");
-    if (nomeSalvo) setUsername(nomeSalvo);
+    const userData = localStorage.getItem("loggedUserData");
+    if (userData) {
+      const parsed = JSON.parse(userData);
+      setUsername(parsed.nome_usuario || "Usuário");
+    }
 
     const emailSalvo = localStorage.getItem("loggedEmail");
     if (emailSalvo) setEmail(emailSalvo);
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("loggedUser");
+    localStorage.removeItem("loggedUserData");
     window.location.href = "/login";
   };
 
@@ -50,17 +52,6 @@ export default function ProfilePage() {
 
         <div
           className="bg-white rounded-2xl p-4 shadow flex items-center justify-between cursor-pointer hover:bg-gray-50"
-          onClick={() => setModalOpen("notificacoes")}
-        >
-          <div className="flex items-center gap-2">
-            <Bell className="text-green-600" />
-            <p className="font-medium text-gray-800">Notificações</p>
-          </div>
-          <span className="text-gray-400 text-sm">Ver</span>
-        </div>
-
-        <div
-          className="bg-white rounded-2xl p-4 shadow flex items-center justify-between cursor-pointer hover:bg-gray-50"
           onClick={() => setModalOpen("lembretes")}
         >
           <div className="flex items-center gap-2">
@@ -74,7 +65,6 @@ export default function ProfilePage() {
       <MenuDown />
 
       {modalOpen === "config" && <ConfigModal onClose={() => setModalOpen(null)} />}
-      {modalOpen === "notificacoes" && <NotificationsModal onClose={() => setModalOpen(null)} />}
       {modalOpen === "lembretes" && <RemindersModal onClose={() => setModalOpen(null)} />}
     </div>
   );

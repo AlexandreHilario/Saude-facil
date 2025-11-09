@@ -1,73 +1,69 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft } from "lucide-react";
 import Header from "../components/Header";
 import MenuDown from "../components/MenuDown";
-import { useNavigate } from "react-router-dom";
+import { supabase } from "../config/DataBase";
 
 export default function Servicos() {
+  const [servicos, setServicos] = useState([]);
   const [selectedServico, setSelectedServico] = useState(null);
   const [username, setUsername] = useState("Usuário");
-  const navigate = useNavigate();
 
-   useEffect(() => {
-      const nomeSalvo = localStorage.getItem("loggedUser");
-      if (nomeSalvo) setUsername(nomeSalvo);
-    }, []);
+  useEffect(() => {
+    const nomeSalvo = JSON.parse(localStorage.getItem("loggedUserData"));
+    if (nomeSalvo) setUsername(nomeSalvo.nome_usuario);
+    buscarServicos();
+  }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("loggedUser");
-    window.location.href = "/login";
+  const buscarServicos = async () => {
+    const { data, error } = await supabase
+      .from("servicos")
+      .select(`
+        id_servico,
+        nome_servico,
+        descricao,
+        id_unidade,
+        unidades (nome_unidade)
+      `);
+
+    if (error) {
+      console.error("Erro ao buscar serviços:", error.message);
+    } else {
+      setServicos(data);
+    }
   };
 
-  const servicos = [
-    {
-      nome: "Vacinação",
-      descricao: "Serviço de imunização contra doenças como gripe, COVID-19, hepatite, e outras.",
-      local: "UBS Centro",
-      horario: "Seg a Sex - 8h às 17h",
-    },
-    {
-      nome: "Atendimento Médico",
-      descricao: "Consultas médicas com clínico geral e encaminhamento para especialistas.",
-      local: "UBS Boa Vista",
-      horario: "Seg a Sex - 7h às 16h",
-    },
-    {
-      nome: "Saúde Bucal",
-      descricao: "Atendimento odontológico preventivo e corretivo para todas as idades.",
-      local: "UBS Jardim",
-      horario: "Seg a Sex - 8h às 17h",
-    },
-    {
-      nome: "Pré-natal",
-      descricao: "Acompanhamento médico para gestantes durante toda a gestação.",
-      local: "UBS Santo Antônio",
-      horario: "Seg a Sex - 8h às 14h",
-    },
-  ];
+  const handleLogout = () => {
+    localStorage.removeItem("loggedUserData");
+    window.location.href = "/login";
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col pb-24">
       <Header username={username} onLogout={handleLogout} />
-      
+
       <div className="px-4 mt-4">
-        <ArrowLeft className="text-gray-700" onClick={() => navigate(-1)}/>
         <h2 className="text-xl font-semibold text-gray-800 mb-4">
           Serviços do SUS
         </h2>
 
-        <ul className="space-y-3">
-          {servicos.map((s, index) => (
-            <li
-              key={index}
-              className="bg-white p-4 rounded-2xl shadow cursor-pointer hover:bg-gray-50 transition"
-              onClick={() => setSelectedServico(s)}
-            >
-              <p className="font-semibold text-gray-800">{s.nome}</p>
-              <p className="text-sm text-gray-500">{s.local}</p>
-            </li>
-          ))}
-        </ul>
+        {servicos.length === 0 ? (
+          <p className="text-gray-500 text-sm">Nenhum serviço encontrado.</p>
+        ) : (
+          <ul className="space-y-3">
+            {servicos.map((s) => (
+              <li
+                key={s.id_servico}
+                className="bg-white p-4 rounded-2xl shadow cursor-pointer hover:bg-gray-50 transition"
+                onClick={() => setSelectedServico(s)}
+              >
+                <p className="font-semibold text-gray-800">{s.nome_servico}</p>
+                <p className="text-sm text-gray-500">
+                  {s.unidades?.nome_unidade || "Sem unidade"}
+                </p>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
       <MenuDown />
@@ -76,16 +72,14 @@ export default function Servicos() {
         <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
           <div className="bg-white rounded-2xl shadow-lg p-5 w-11/12 max-w-md">
             <h2 className="text-lg font-semibold mb-3 text-gray-800">
-              {selectedServico.nome}
+              {selectedServico.nome_servico}
             </h2>
             <p className="text-sm text-gray-700 mb-2">
               {selectedServico.descricao}
             </p>
-            <p className="text-xs text-gray-500">
-              <strong>Local:</strong> {selectedServico.local}
-            </p>
             <p className="text-xs text-gray-500 mb-4">
-              <strong>Horário:</strong> {selectedServico.horario}
+              <strong>Unidade:</strong>{" "}
+              {selectedServico.unidades?.nome_unidade || "Sem unidade"}
             </p>
             <button
               className="mt-2 bg-green-600 text-white px-4 py-2 rounded-lg w-full"

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { LogOut } from "lucide-react";
 import { Bell } from "lucide-react";
-import NotificationsModal from "../components/modals/NotificationsModal";
+import RemindersModal from "./modals/RemindersModal";
 
 export default function Header({ username, onLogout }) {
 
@@ -34,7 +34,7 @@ export default function Header({ username, onLogout }) {
         <span className="text-sm font-medium">Sair</span>
       </button>
       </div>
-      {modalOpen === "notificacoes" && <NotificationsModal onClose={() => setModalOpen(null)} />}
+      {modalOpen === "notificacoes" && <RemindersModal onClose={() => setModalOpen(null)} />}
     </div>
   );
 }

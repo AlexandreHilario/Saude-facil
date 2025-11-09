@@ -20,12 +20,19 @@ export default function Login() {
     );
 
     if (!user) {
-      alert("❌ Login ou senha incorretos!");
+      alert("Login ou senha incorretos!");
       return;
     }
 
-    localStorage.setItem("loggedUser", user.username);
-    localStorage.setItem("loggedEmail", user.email);
+    localStorage.setItem(
+      "loggedUserData",
+      JSON.stringify({
+        id_usuario: user.id_usuario || 1, 
+        nome_usuario: user.username,
+        email: user.email,
+      })
+    );
+    
     navigate("/");
   };
 

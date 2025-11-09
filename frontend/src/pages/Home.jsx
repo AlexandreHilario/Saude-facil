@@ -15,18 +15,18 @@ export default function HomePage() {
   const [medsPorCategoria, setMedsPorCategoria] = useState([]);
 
   useEffect(() => {
-    const nomeSalvo = localStorage.getItem("loggedUser");
-    if (nomeSalvo) setUsername(nomeSalvo);
-
+    const userData = localStorage.getItem("loggedUserData");
+    if (userData) {
+      const parsed = JSON.parse(userData);
+      setUsername(parsed.nome_usuario || "Usuário");
+    }
     const fetchData = async () => {
-      // Busca unidades
       const { data: unids, error: unidsError } = await supabase
         .from("unidades")
         .select("*");
       if (unidsError) console.error("Erro ao buscar unidades:", unidsError);
       else setUnidades(unids || []);
 
-      // Busca medicamentos disponíveis
       const { data: meds, error: medsError } = await supabase
         .from("medicamentos")
         .select("*")
@@ -34,7 +34,6 @@ export default function HomePage() {
       if (medsError) console.error("Erro ao buscar medicamentos:", medsError);
       else {
         setMedicamentos(meds || []);
-        // Extrai categorias únicas
         const cats = [...new Set(meds.map((m) => m.categoria))];
         setCategorias(cats);
       }
@@ -44,7 +43,7 @@ export default function HomePage() {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("loggedUser");
+    localStorage.removeItem("loggedUserData");
     window.location.href = "/login";
   };
 
@@ -110,7 +109,6 @@ export default function HomePage() {
 
       <MenuDown />
 
-      {/* Modal geral de medicamentos */}
       {showMedicamentos && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
           <div className="bg-white rounded-2xl shadow-lg p-5 w-11/12 max-w-md">
@@ -152,7 +150,6 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* Modal de categoria */}
       {categoriaSelecionada && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
           <div className="bg-white rounded-2xl shadow-lg p-5 w-11/12 max-w-md">
@@ -191,7 +188,6 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* Modal de unidades */}
       {showUnidades && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
           <div className="bg-white rounded-2xl shadow-lg p-5 w-11/12 max-w-md">

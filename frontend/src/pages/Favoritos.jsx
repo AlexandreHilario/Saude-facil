@@ -2,30 +2,64 @@ import { useState, useEffect } from "react";
 import { Heart, Trash2, Building, Pill } from "lucide-react";
 import MenuDown from "../components/MenuDown";
 import Header from "../components/Header";
+import { supabase } from "../config/DataBase"; // 👈 IMPORTANTE
 
 export default function Favoritos() {
   const [username, setUsername] = useState("Usuário");
   const [favoritos, setFavoritos] = useState([]);
 
   useEffect(() => {
-    const nomeSalvo = localStorage.getItem("loggedUser");
-    if (nomeSalvo) setUsername(nomeSalvo);
+    const fetchFavoritos = async () => {
+      const user = JSON.parse(localStorage.getItem("loggedUserData"));
+      if (!user) return;
 
-    const favoritosSalvos = [
-      { tipo: "Medicamento", nome: "Dipirona Sódica", detalhe: "UBS Centro" },
-      { tipo: "Medicamento", nome: "Amoxicilina", detalhe: "UBS Boa Vista" },
-      { tipo: "Unidade", nome: "UBS Jardim", detalhe: "Rua Esperança, 45" },
-    ];
-    setFavoritos(favoritosSalvos);
+      setUsername(user.nome_usuario);
+
+      const { data, error } = await supabase
+        .from("favoritos")
+        .select(`
+          id_favorito,
+          tipo,
+          detalhe,
+          medicamentos:medicamentos (nome_medicamento)
+        `)
+        .eq("id_usuario", user.id_usuario);
+
+      if (error) {
+        console.error("Erro ao carregar favoritos:", error);
+        return;
+      }
+
+      const formatados = data.map((fav) => ({
+        tipo: fav.tipo,
+        nome: fav.medicamentos?.nome_medicamento || "Desconhecido",
+        detalhe: fav.detalhe,
+      }));
+
+      setFavoritos(formatados);
+    };
+
+    fetchFavoritos();
   }, []);
 
-  const removerFavorito = (index) => {
-    const novosFavoritos = favoritos.filter((_, i) => i !== index);
-    setFavoritos(novosFavoritos);
+  const removerFavorito = async (index) => {
+    const user = JSON.parse(localStorage.getItem("loggedUserData"));
+    const favorito = favoritos[index];
+
+    const { error } = await supabase
+      .from("favoritos")
+      .delete()
+      .eq("id_usuario", user.id_usuario)
+      .eq("tipo", favorito.tipo)
+      .eq("detalhe", favorito.detalhe);
+
+    if (error) console.error("Erro ao remover:", error);
+    else setFavoritos(favoritos.filter((_, i) => i !== index));
   };
 
   const handleLogout = () => {
     localStorage.removeItem("loggedUser");
+    localStorage.removeItem("loggedUserData");
     window.location.href = "/login";
   };
 
@@ -33,7 +67,7 @@ export default function Favoritos() {
     <div className="min-h-screen bg-gray-50 pb-24 flex flex-col">
       <Header username={username} onLogout={handleLogout} />
 
-      <div className="px-4 mt-5">
+      <div className="px-4 mt-5 overflow-y-auto max-h-[70vh]">
         {favoritos.length === 0 ? (
           <div className="text-center text-gray-500 mt-20">
             <Heart className="mx-auto mb-3 text-gray-400" size={40} />

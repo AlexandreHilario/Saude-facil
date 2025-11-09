@@ -1,14 +1,13 @@
 import { useState, useEffect } from "react";
 import MenuDown from "../components/MenuDown";
 import Header from "../components/Header";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { supabase } from "../config/DataBase";
 import iconUrl from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
 
-// Ícone padrão do Leaflet (azul)
 const defaultIcon = L.icon({
   iconUrl,
   shadowUrl: iconShadow,
@@ -18,15 +17,23 @@ const defaultIcon = L.icon({
   shadowSize: [41, 41],
 });
 
-// Ícone vermelho para o usuário
 const redIcon = new L.Icon({
-  iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
+  iconUrl:
+    "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
   shadowUrl: iconShadow,
   iconSize: [25, 41],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
   shadowSize: [41, 41],
 });
+
+function SetViewOnLocation({ coords }) {
+  const map = useMap();
+  useEffect(() => {
+    if (coords) map.setView(coords, 15);
+  }, [coords]);
+  return null;
+}
 
 export default function Mapa() {
   const [username, setUsername] = useState("Usuário");
@@ -35,8 +42,11 @@ export default function Mapa() {
   const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
-    const nomeSalvo = localStorage.getItem("loggedUser");
-    if (nomeSalvo) setUsername(nomeSalvo);
+    const userData = localStorage.getItem("loggedUserData");
+    if (userData) {
+      const parsed = JSON.parse(userData);
+      setUsername(parsed.nome_usuario || "Usuário");
+    }
 
     const fetchUnidades = async () => {
       const { data, error } = await supabase.from("unidades").select("*");
@@ -67,7 +77,7 @@ export default function Mapa() {
 
   const defaultCenter = userLocation
     ? [userLocation.latitude, userLocation.longitude]
-    : [-8.063169, -34.871139]; // Recife
+    : [-8.063169, -34.871139];
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col pb-24">
@@ -86,21 +96,24 @@ export default function Mapa() {
           >
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-            {/* Localização do usuário */}
             {userLocation && (
-              <Marker
-                position={[userLocation.latitude, userLocation.longitude]}
-                icon={redIcon}
-              >
-                <Popup>
-                  <strong>Sua localização</strong>
-                  <br />
-                  {username}
-                </Popup>
-              </Marker>
+              <>
+                <Marker
+                  position={[userLocation.latitude, userLocation.longitude]}
+                  icon={redIcon}
+                >
+                  <Popup>
+                    <strong>Sua localização</strong>
+                    <br />
+                    {username}
+                  </Popup>
+                </Marker>
+                <SetViewOnLocation
+                  coords={[userLocation.latitude, userLocation.longitude]}
+                />
+              </>
             )}
 
-            {/* Unidades */}
             {unidades.map(
               (u) =>
                 u.latitude &&
